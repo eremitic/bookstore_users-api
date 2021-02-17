@@ -5,6 +5,12 @@ import (
 	"github.com/eremitic/bookstore_users-api/datasources/mysql/users_db"
 	"github.com/eremitic/bookstore_users-api/utils/date_utils"
 	"github.com/eremitic/bookstore_users-api/utils/errors"
+	"strings"
+)
+
+const (
+	indexUniqueEmail = "email_UNIQUE"
+	queryInsert      = "INSERT INTO users(first_name,last_name,email,date_created)VALUES(?,?,?,?)"
 )
 
 var (
@@ -31,17 +37,31 @@ func (user *User) Get() *errors.RestErr {
 }
 
 func (user *User) Save() *errors.RestErr {
-	current := usersDB[user.Id]
 
-	if current != nil {
-		if current.Email == user.Email {
-			return errors.NewBadReqErr(fmt.Sprintf("email %s used", user.Email))
-		}
-		return errors.NewBadReqErr(fmt.Sprintf("user %d existed", user.Id))
+	stmt, err := users_db.Client.Prepare(queryInsert)
+	if err != nil {
+		return errors.NewInternalErr("user insert q err")
 	}
+	defer stmt.Close()
 
 	user.DateCreated = date_utils.GetNowString()
-	usersDB[user.Id] = user
+
+	insRes, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.DateCreated)
+
+	if err != nil {
+		if strings.Contains(err.Error(), indexUniqueEmail) {
+			return errors.NewBadReqErr("email taken")
+		}
+		return errors.NewInternalErr("user save err")
+	}
+
+	userId, err := insRes.LastInsertId()
+
+	if err != nil {
+		return errors.NewInternalErr("user save err")
+	}
+
+	user.Id = userId
 
 	return nil
 }
