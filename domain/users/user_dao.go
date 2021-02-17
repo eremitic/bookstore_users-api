@@ -9,6 +9,7 @@ import (
 
 const (
 	queryInsert = "INSERT INTO users(first_name,last_name,email,date_created)VALUES(?,?,?,?)"
+	queryUpdate = "UPDATE users SET first_name=?,last_name=?,email=? where id=?"
 	queryGet    = "SELECT * from users where id=?"
 )
 
@@ -53,6 +54,29 @@ func (user *User) Save() *errors.RestErr {
 	}
 
 	user.Id = userId
+
+	return nil
+}
+
+func (user *User) Update() *errors.RestErr {
+
+	stmt, err := users_db.Client.Prepare(queryUpdate)
+	if err != nil {
+		return errors.NewInternalErr("user update q err")
+	}
+	defer stmt.Close()
+
+	upRes, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.Id)
+
+	if err != nil {
+		return mysql_utils.ParseError(err)
+	}
+
+	_, err = upRes.RowsAffected()
+
+	if err != nil {
+		return errors.NewInternalErr("user update err")
+	}
 
 	return nil
 }
