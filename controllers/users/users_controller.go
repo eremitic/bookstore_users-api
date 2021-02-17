@@ -1,16 +1,57 @@
 package users
 
 import (
+	"github.com/eremitic/bookstore_users-api/domain/users"
+	"github.com/eremitic/bookstore_users-api/services"
+	"github.com/eremitic/bookstore_users-api/utils/errors"
 	"github.com/gin-gonic/gin"
+	"strconv"
+
 	"net/http"
 )
 
 func GetUser(c *gin.Context) {
-	c.String(http.StatusOK,"implement me")
+	userId, userErr := strconv.ParseInt(c.Param("id"), 10, 64)
+
+	if userErr != nil {
+		err := errors.NewBadReqErr("id is number only")
+		c.JSON(err.Status, err)
+		return
+	}
+
+	user, getErr := services.GetUser(userId)
+
+	if getErr != nil {
+		err := errors.NewNotFoundErr("user not found")
+		c.JSON(err.Status, err)
+		return
+	}
+	c.JSON(http.StatusOK, user)
+
 }
 
 func CreateUser(c *gin.Context) {
-	c.String(http.StatusOK,"implement me")
+
+	var user users.User
+
+	if err := c.ShouldBindJSON(&user); err != nil {
+
+		restErr := errors.NewBadReqErr("invalid json body")
+		c.JSON(restErr.Status, restErr)
+
+		return
+	}
+
+	result, saveErr := services.CreateUser(user)
+
+	if saveErr != nil {
+
+		c.JSON(saveErr.Status, saveErr)
+		return
+	}
+
+	c.JSON(http.StatusCreated, result)
+
 }
 
 func SearchUser(c *gin.Context) {
