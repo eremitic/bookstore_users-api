@@ -10,6 +10,7 @@ import (
 const (
 	queryInsert = "INSERT INTO users(first_name,last_name,email,date_created)VALUES(?,?,?,?)"
 	queryUpdate = "UPDATE users SET first_name=?,last_name=?,email=? where id=?"
+	queryDelete = "DELETE FROM users where id=?"
 	queryGet    = "SELECT * from users where id=?"
 )
 
@@ -76,6 +77,29 @@ func (user *User) Update() *errors.RestErr {
 
 	if err != nil {
 		return errors.NewInternalErr("user update err")
+	}
+
+	return nil
+}
+
+func (user *User) Delete() *errors.RestErr {
+
+	stmt, err := users_db.Client.Prepare(queryDelete)
+	if err != nil {
+		return errors.NewInternalErr("user delete q err")
+	}
+	defer stmt.Close()
+
+	upRes, err := stmt.Exec(user.Id)
+
+	if err != nil {
+		return mysql_utils.ParseError(err)
+	}
+
+	_, err = upRes.RowsAffected()
+
+	if err != nil {
+		return errors.NewInternalErr("user delete err")
 	}
 
 	return nil
