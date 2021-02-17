@@ -11,6 +11,7 @@ import (
 const (
 	indexUniqueEmail = "email_UNIQUE"
 	queryInsert      = "INSERT INTO users(first_name,last_name,email,date_created)VALUES(?,?,?,?)"
+	queryGet         = "SELECT * from users where id=?"
 )
 
 var (
@@ -19,19 +20,18 @@ var (
 
 func (user *User) Get() *errors.RestErr {
 
-	if err := users_db.Client.Ping(); err != nil {
-		panic(err)
-	}
-	result := usersDB[user.Id]
-	if result == nil {
-		return errors.NewNotFoundErr(fmt.Sprintf("user %d not found", user.Id))
+	stmt, err := users_db.Client.Prepare(queryGet)
+
+	if err != nil {
+		return errors.NewInternalErr("user get q err")
 	}
 
-	user.Id = result.Id
-	user.FirstName = result.FirstName
-	user.LastName = result.LastName
-	user.Email = result.Email
-	user.DateCreated = result.DateCreated
+	defer stmt.Close()
+	reqId := user.Id
+	result := stmt.QueryRow(user.Id)
+	if err := result.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated); err != nil {
+		return errors.NewNotFoundErr(fmt.Sprintf("user %d not found", reqId))
+	}
 
 	return nil
 }
