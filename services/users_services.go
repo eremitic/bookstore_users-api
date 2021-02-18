@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/eremitic/bookstore_users-api/domain/users"
+	"github.com/eremitic/bookstore_users-api/utils/crypto_utils"
 	"github.com/eremitic/bookstore_users-api/utils/date_utils"
 	"github.com/eremitic/bookstore_users-api/utils/errors"
 )
@@ -12,6 +13,7 @@ func CreateUser(user users.User) (*users.User, *errors.RestErr) {
 	}
 
 	user.Status = users.StatusActive
+	user.Password = crypto_utils.GetMD5(user.Password)
 	user.DateCreated = date_utils.GetDbString()
 	if createErr := user.Save(); createErr != nil {
 		return nil, createErr
@@ -68,7 +70,7 @@ func DeleteUser(id int64) *errors.RestErr {
 
 }
 
-func Search(status string) ([]users.User, *errors.RestErr) {
+func Search(status string) (users.Users, *errors.RestErr) {
 	dao := &users.User{}
 	return dao.FindByStatus(status)
 
