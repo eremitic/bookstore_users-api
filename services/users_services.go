@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/eremitic/bookstore_users-api/domain/users"
+	"github.com/eremitic/bookstore_users-api/utils/date_utils"
 	"github.com/eremitic/bookstore_users-api/utils/errors"
 )
 
@@ -10,6 +11,8 @@ func CreateUser(user users.User) (*users.User, *errors.RestErr) {
 		return nil, createErr
 	}
 
+	user.Status = users.StatusActive
+	user.DateCreated = date_utils.GetDbString()
 	if createErr := user.Save(); createErr != nil {
 		return nil, createErr
 	}
@@ -62,5 +65,11 @@ func DeleteUser(id int64) *errors.RestErr {
 		return err
 	}
 	return nil
+
+}
+
+func Search(status string) ([]users.User, *errors.RestErr) {
+	dao := &users.User{}
+	return dao.FindByStatus(status)
 
 }

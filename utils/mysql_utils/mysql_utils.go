@@ -1,6 +1,7 @@
 package mysql_utils
 
 import (
+	"fmt"
 	"github.com/eremitic/bookstore_users-api/utils/errors"
 	"github.com/go-sql-driver/mysql"
 	"strings"
@@ -16,7 +17,7 @@ func ParseError(err error) *errors.RestErr {
 		if strings.Contains(err.Error(), errorNoRows) {
 			return errors.NewNotFoundErr("no record given id")
 		}
-
+		fmt.Println(err.Error())
 		return errors.NewInternalErr("err parsing db response")
 	}
 
@@ -24,6 +25,6 @@ func ParseError(err error) *errors.RestErr {
 	case 1062:
 		return errors.NewBadReqErr("invalid data")
 	}
-	return errors.NewInternalErr("err process db req")
+	return errors.NewInternalErr(sqlErr.Error())
 
 }

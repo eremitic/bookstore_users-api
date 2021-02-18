@@ -30,7 +30,7 @@ func Get(c *gin.Context) {
 	user, getErr := services.GetUser(userId)
 
 	if getErr != nil {
-		err := errors.NewNotFoundErr("user not found")
+		err := errors.NewNotFoundErr(getErr.Message)
 		c.JSON(err.Status, err)
 		return
 	}
@@ -111,4 +111,17 @@ func Delete(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]string{"status": "deleted"})
+}
+
+func Search(c *gin.Context) {
+	status := c.Query("status")
+	users, err := services.Search(status)
+	if err != nil {
+
+		c.JSON(err.Status, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
+
 }
