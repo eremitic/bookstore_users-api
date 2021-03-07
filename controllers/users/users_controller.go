@@ -58,8 +58,9 @@ func Create(c *gin.Context) {
 		c.JSON(saveErr.Status, saveErr)
 		return
 	}
-
-	c.JSON(http.StatusCreated, result.Marshall(c.GetHeader("X-Public") == "true"))
+	_ = result
+	//c.JSON(http.StatusCreated, result.Marshall(c.GetHeader("X-Public") == "true"))
+	c.JSON(http.StatusCreated, "ok")
 
 }
 
