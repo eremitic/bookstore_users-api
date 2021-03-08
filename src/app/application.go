@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/eremitic/bookstore_users-api/logger"
+	"github.com/eremitic/bookstore_users-api/src/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,5 +12,5 @@ var (
 func StartApplication() {
 	mapUrls()
 	logger.Info("start app")
-	router.Run(":8080")
+	router.Run(":8081")
 }

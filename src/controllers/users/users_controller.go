@@ -2,9 +2,9 @@ package users
 
 import (
 	"fmt"
-	"github.com/eremitic/bookstore_users-api/domain/users"
-	"github.com/eremitic/bookstore_users-api/services"
-	"github.com/eremitic/bookstore_users-api/utils/errors"
+	"github.com/eremitic/bookstore_users-api/src/domain/users"
+	"github.com/eremitic/bookstore_users-api/src/services"
+	"github.com/eremitic/bookstore_users-api/src/utils/errors"
 	"github.com/gin-gonic/gin"
 	"strconv"
 

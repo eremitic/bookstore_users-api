@@ -2,9 +2,9 @@ package users
 
 import (
 	"fmt"
-	"github.com/eremitic/bookstore_users-api/datasources/mysql/users_db"
-	"github.com/eremitic/bookstore_users-api/logger"
-	"github.com/eremitic/bookstore_users-api/utils/errors"
+	"github.com/eremitic/bookstore_users-api/src/datasources/mysql/users_db"
+	"github.com/eremitic/bookstore_users-api/src/logger"
+	"github.com/eremitic/bookstore_users-api/src/utils/errors"
 )
 
 const (

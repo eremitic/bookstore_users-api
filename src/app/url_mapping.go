@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/eremitic/bookstore_users-api/controllers/ping"
-	"github.com/eremitic/bookstore_users-api/controllers/users"
+	"github.com/eremitic/bookstore_users-api/src/controllers/ping"
+	"github.com/eremitic/bookstore_users-api/src/controllers/users"
 )
 
 func mapUrls() {

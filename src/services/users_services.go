@@ -1,10 +1,10 @@
 package services
 
 import (
-	"github.com/eremitic/bookstore_users-api/domain/users"
-	"github.com/eremitic/bookstore_users-api/utils/crypto_utils"
-	"github.com/eremitic/bookstore_users-api/utils/date_utils"
-	"github.com/eremitic/bookstore_users-api/utils/errors"
+	"github.com/eremitic/bookstore_users-api/src/domain/users"
+	"github.com/eremitic/bookstore_users-api/src/utils/crypto_utils"
+	"github.com/eremitic/bookstore_users-api/src/utils/date_utils"
+	"github.com/eremitic/bookstore_users-api/src/utils/errors"
 )
 
 var (

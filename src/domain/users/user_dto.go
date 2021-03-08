@@ -1,7 +1,7 @@
 package users
 
 import (
-	"github.com/eremitic/bookstore_users-api/utils/errors"
+	"github.com/eremitic/bookstore_users-api/src/utils/errors"
 	"strings"
 )
 
