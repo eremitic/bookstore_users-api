@@ -5,14 +5,17 @@ import (
 	"github.com/eremitic/bookstore_users-api/src/datasources/mysql/users_db"
 	"github.com/eremitic/bookstore_users-api/src/logger"
 	"github.com/eremitic/bookstore_users-api/src/utils/errors"
+	"github.com/eremitic/bookstore_users-api/src/utils/mysql_utils"
+	"strings"
 )
 
 const (
-	queryInsert       = "INSERT INTO users(first_name,last_name,email,date_created,password,status)VALUES(?,?,?,?,?,?)"
-	queryUpdate       = "UPDATE users SET first_name=?,last_name=?,email=? where id=?"
-	queryDelete       = "DELETE FROM users where id=?"
-	queryGet          = "SELECT id,first_name,last_name,email,date_created,status from users where id=?"
-	queryFindByStatus = "SELEC id,first_name,last_name,email,date_created,status from users where status=?"
+	queryInsert                 = "INSERT INTO users(first_name,last_name,email,date_created,password,status)VALUES(?,?,?,?,?,?)"
+	queryUpdate                 = "UPDATE users SET first_name=?,last_name=?,email=? where id=?"
+	queryDelete                 = "DELETE FROM users where id=?"
+	queryGet                    = "SELECT id,first_name,last_name,email,date_created,status from users where id=?"
+	queryFindByStatus           = "SELEC id,first_name,last_name,email,date_created,status from users where status=?"
+	queryFindByEmailAndPassword = "SELECT id,first_name,last_name,email,date_created,status from users where email=? and password=? and status=?"
 )
 
 func (user *User) Get() *errors.RestErr {
@@ -148,5 +151,27 @@ func (user *User) FindByStatus(status string) ([]User, *errors.RestErr) {
 		return nil, errors.NewNotFoundErr(fmt.Sprintf("no user match stauts %s", status))
 	}
 	return res, nil
+
+}
+
+func (user *User) FindByEmailAndPassword() *errors.RestErr {
+	stmt, err := users_db.Client.Prepare(queryFindByEmailAndPassword)
+
+	if err != nil {
+		logger.Error("user find by email and pass prepare query err", err)
+		return errors.NewInternalErr("db err")
+	}
+	defer stmt.Close()
+
+	result := stmt.QueryRow(user.Email, user.Password, StatusActive)
+
+	if getErr := result.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated, &user.Status); getErr != nil {
+		if strings.Contains(getErr.Error(), mysql_utils.ErrorNoRows) {
+			return errors.NewNotFoundErr("invalid credential")
+		}
+		logger.Error("user find status parse query err", getErr)
+		return errors.NewInternalErr("db parse err")
+	}
+	return nil
 
 }
